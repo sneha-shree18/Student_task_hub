@@ -1,0 +1,1211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Task Hub - Dynamic Prototype</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #f8fafc;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #2563eb 100%);
+        }
+
+        .nav-btn.active {
+            background-color: #4f46e5;
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+        }
+
+        .nav-btn {
+            transition: all 0.2s ease-in-out;
+        }
+
+        /* Toast animation */
+        @keyframes slideIn {
+            from { transform: translateY(100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .toast-animate {
+            animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        /* Pulse glow for urgent items */
+        .urgent-glow {
+            box-shadow: 0 0 12px rgba(225, 29, 72, 0.25);
+        }
+    </style>
+</head>
+<body class="text-slate-800 min-h-screen flex flex-col relative">
+
+    <!-- ================= ONBOARDING / LOGIN SCREEN ================= -->
+    <div id="screen-login" class="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-md rounded-3xl p-6 sm:p-8 shadow-2xl border border-slate-100 space-y-6">
+            
+            <div class="text-center space-y-2">
+                <div class="w-14 h-14 gradient-bg rounded-2xl mx-auto flex items-center justify-center text-white font-bold text-2xl shadow-lg">
+                    <i class="fa-solid fa-graduation-cap"></i>
+                </div>
+                <h1 class="text-2xl font-extrabold text-slate-900 tracking-tight">Student Task Hub</h1>
+                <p class="text-xs font-semibold text-slate-500">Enter your details to access your task portal</p>
+            </div>
+
+            <!-- Login Form -->
+            <form id="login-form" onsubmit="handleLogin(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold uppercase text-slate-600 mb-1" for="login-name">
+                        Full Name <span class="text-rose-500">*</span>
+                    </label>
+                    <div class="relative">
+                        <i class="fa-solid fa-user absolute left-3.5 top-3.5 text-slate-400 text-sm"></i>
+                        <input type="text" id="login-name" required placeholder="e.g. Shivani"
+                               class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold uppercase text-slate-600 mb-1" for="login-reg">
+                        Register / Roll Number <span class="text-rose-500">*</span>
+                    </label>
+                    <div class="relative">
+                        <i class="fa-solid fa-id-card absolute left-3.5 top-3.5 text-slate-400 text-sm"></i>
+                        <input type="text" id="login-reg" required placeholder="e.g. R22AB123"
+                               class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition uppercase">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold uppercase text-slate-600 mb-1" for="login-sem">
+                        Semester & Branch <span class="text-rose-500">*</span>
+                    </label>
+                    <div class="relative">
+                        <i class="fa-solid fa-book-bookmark absolute left-3.5 top-3.5 text-slate-400 text-sm"></i>
+                        <select id="login-sem" required class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition">
+                            <option value="Semester 1 - Computer Science Engineering">Semester 1 - Computer Science Engineering</option>
+                            <option value="Semester 2 - Computer Science Engineering">Semester 2 - Computer Science Engineering</option>
+                            <option value="Semester 3 - Computer Science Engineering" selected>Semester 3 - Computer Science Engineering</option>
+                            <option value="Semester 4 - Computer Science Engineering">Semester 4 - Computer Science Engineering</option>
+                            <option value="Semester 5 - Computer Science Engineering">Semester 5 - Computer Science Engineering</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Fast Demo Profile Quick Fills -->
+                <div class="pt-1">
+                    <span class="block text-[11px] font-bold text-slate-400 mb-2">Or Quick Fill Demo Profile:</span>
+                    <div class="flex gap-2">
+                        <button type="button" onclick="quickFillLogin('Shivani A', 'R22AB123', 'Semester 3 - Computer Science Engineering')" 
+                                class="text-xs bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold px-3 py-1.5 rounded-lg transition flex-grow text-center">
+                            👤 Shivani A
+                        </button>
+                        <button type="button" onclick="quickFillLogin('Pranav Kumar', 'R23ED021', 'Semester 2 - Computer Science Engineering')" 
+                                class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-3 py-1.5 rounded-lg transition flex-grow text-center">
+                            👤 Pavan Kumar
+                        </button>
+                    </div>
+                </div>
+
+                <button type="submit" class="w-full gradient-bg text-white font-bold py-3 rounded-xl shadow-lg hover:opacity-95 transition flex items-center justify-center gap-2 text-sm mt-2">
+                    <i class="fa-solid fa-right-to-bracket"></i> Access Task Hub Portal
+                </button>
+            </form>
+
+        </div>
+    </div>
+
+    <!-- ================= MAIN APP INTERFACE ================= -->
+    <div id="main-app" class="hidden flex-grow flex flex-col">
+
+        <!-- HEADER & NAVIGATION -->
+        <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex items-center justify-between h-16">
+                    
+                    <!-- Logo -->
+                    <div class="flex items-center gap-3 cursor-pointer" onclick="navigateTo('dashboard')">
+                        <div class="w-10 h-10 gradient-bg rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-md">
+                            <i class="fa-solid fa-graduation-cap"></i>
+                        </div>
+                        <div>
+                            <span class="font-extrabold text-xl tracking-tight text-slate-900 flex items-center gap-2">
+                                Student Task Hub
+                            </span>
+                            <p class="text-[11px] text-slate-500 font-semibold hidden sm:block">All-in-one deadline tracker</p>
+                        </div>
+                    </div>
+
+                    <!-- Desktop Navigation Tabs -->
+                    <nav class="hidden lg:flex items-center gap-1 bg-slate-100 p-1 rounded-xl">
+                        <button id="nav-dashboard" onclick="navigateTo('dashboard')" class="nav-btn active px-4 py-2 rounded-lg font-semibold text-sm flex items-center gap-2 text-slate-600 hover:text-slate-900">
+                            <i class="fa-solid fa-chart-pie"></i> Dashboard
+                        </button>
+                        <button id="nav-assignments" onclick="navigateTo('assignments')" class="nav-btn px-4 py-2 rounded-lg font-semibold text-sm flex items-center gap-2 text-slate-600 hover:text-slate-900">
+                            <i class="fa-solid fa-list-check"></i> Tasks
+                        </button>
+                        <button id="nav-add" onclick="navigateTo('add')" class="nav-btn px-4 py-2 rounded-lg font-semibold text-sm flex items-center gap-2 text-slate-600 hover:text-slate-900">
+                            <i class="fa-solid fa-plus-circle"></i> Add Task
+                        </button>
+                        <button id="nav-whatsapp" onclick="navigateTo('whatsapp')" class="nav-btn px-4 py-2 rounded-lg font-semibold text-sm flex items-center gap-2 text-slate-600 hover:text-slate-900">
+                            <i class="fa-brands fa-whatsapp text-emerald-500"></i> WhatsApp Import
+                        </button>
+                        <button id="nav-calendar" onclick="navigateTo('calendar')" class="nav-btn px-4 py-2 rounded-lg font-semibold text-sm flex items-center gap-2 text-slate-600 hover:text-slate-900">
+                            <i class="fa-regular fa-calendar-days"></i> Calendar
+                        </button>
+                    </nav>
+
+                    <!-- User Profile & Quick Actions -->
+                    <div class="flex items-center gap-3">
+                        <!-- Student Profile Badge -->
+                        <div class="hidden sm:flex items-center gap-2 bg-indigo-50 border border-indigo-100 px-3 py-1.5 rounded-xl">
+                            <div class="w-7 h-7 rounded-lg bg-indigo-600 text-white font-extrabold text-xs flex items-center justify-center" id="header-user-avatar">
+                                AR
+                            </div>
+                            <div class="text-left leading-none">
+                                <div class="text-xs font-bold text-slate-800" id="header-user-name">Alex Rivera</div>
+                                <div class="text-[10px] text-indigo-600 font-semibold" id="header-user-reg">21BCE0491</div>
+                            </div>
+                        </div>
+
+                        <!-- Logout / Switch User -->
+                        <button onclick="handleLogout()" title="Switch Student / Logout" class="p-2 text-slate-500 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition border border-slate-200">
+                            <i class="fa-solid fa-arrow-right-from-bracket text-sm"></i>
+                        </button>
+
+                        <!-- LMS Sync Button -->
+                        <button onclick="triggerLmsSync()" id="btn-lms-sync" class="bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5">
+                            <i class="fa-solid fa-rotate text-blue-600" id="icon-sync"></i>
+                            <span class="hidden sm:inline">Sync LMS</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mobile Navigation Bar -->
+            <div class="lg:hidden flex border-t border-slate-200 bg-white justify-around p-2 text-xs font-semibold">
+                <button onclick="navigateTo('dashboard')" class="flex flex-col items-center gap-1 text-indigo-600" id="mob-dashboard">
+                    <i class="fa-solid fa-chart-pie text-base"></i> Home
+                </button>
+                <button onclick="navigateTo('assignments')" class="flex flex-col items-center gap-1 text-slate-500" id="mob-assignments">
+                    <i class="fa-solid fa-list-check text-base"></i> Tasks
+                </button>
+                <button onclick="navigateTo('add')" class="flex flex-col items-center gap-1 text-slate-500" id="mob-add">
+                    <i class="fa-solid fa-plus-circle text-base"></i> Add
+                </button>
+                <button onclick="navigateTo('whatsapp')" class="flex flex-col items-center gap-1 text-slate-500" id="mob-whatsapp">
+                    <i class="fa-brands fa-whatsapp text-base"></i> Parser
+                </button>
+                <button onclick="navigateTo('calendar')" class="flex flex-col items-center gap-1 text-slate-500" id="mob-calendar">
+                    <i class="fa-regular fa-calendar-days text-base"></i> Calendar
+                </button>
+            </div>
+        </header>
+
+        <!-- MAIN CONTAINER -->
+        <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+            <!-- ================= SECTION 1: DASHBOARD ================= -->
+            <section id="section-dashboard" class="space-y-6">
+                
+                <!-- Welcome Hero & Overall Progress -->
+                <div class="gradient-bg rounded-3xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+                    <div class="relative z-10 max-w-xl space-y-1">
+                        <div class="flex items-center gap-2">
+                            <span class="bg-white/20 text-white text-[10px] font-extrabold uppercase px-3 py-0.5 rounded-full backdrop-blur-sm tracking-wider">
+                                Active Student Portal
+                            </span>
+                            <span class="text-xs text-indigo-200 font-bold" id="hero-user-reg">21BCE0491</span>
+                        </div>
+                        <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight" id="hero-user-name">Welcome back, Student! 👋</h1>
+                        <p class="text-xs sm:text-sm text-indigo-100 font-medium" id="hero-user-sem">Semester 3 - Computer Science Engineering</p>
+                        <p class="mt-2 text-indigo-100 text-xs leading-relaxed opacity-90">
+                            Consolidating your LMS notices, WhatsApp group announcements, and classroom tasks into one place.
+                        </p>
+                    </div>
+
+                    <!-- Live Completion Progress Widget -->
+                    <div class="relative z-10 bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/20 w-full md:w-64">
+                        <div class="flex items-center justify-between text-xs font-bold text-indigo-100 mb-2">
+                            <span>Completion Rate</span>
+                            <span id="hero-progress-percent">0%</span>
+                        </div>
+                        <div class="w-full bg-black/20 rounded-full h-3 overflow-hidden">
+                            <div id="hero-progress-bar" class="bg-emerald-400 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+                        </div>
+                        <p class="text-[11px] text-indigo-200 mt-2 text-right" id="hero-progress-text">0 of 0 tasks completed</p>
+                    </div>
+                </div>
+
+                <!-- KPI Cards Grid -->
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                    <!-- Total -->
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm">
+                        <div class="flex items-center justify-between text-slate-500 mb-2">
+                            <span class="text-xs font-bold uppercase tracking-wider">Total Tasks</span>
+                            <div class="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center">
+                                <i class="fa-solid fa-folder-open text-sm"></i>
+                            </div>
+                        </div>
+                        <div class="text-3xl font-extrabold text-slate-900" id="stat-total">0</div>
+                        <p class="text-[11px] text-slate-400 mt-1">Unified sources</p>
+                    </div>
+
+                    <!-- Pending -->
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm">
+                        <div class="flex items-center justify-between text-slate-500 mb-2">
+                            <span class="text-xs font-bold uppercase tracking-wider">Pending</span>
+                            <div class="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center">
+                                <i class="fa-solid fa-clock text-sm"></i>
+                            </div>
+                        </div>
+                        <div class="text-3xl font-extrabold text-amber-600" id="stat-pending">0</div>
+                        <p class="text-[11px] text-amber-600 font-medium mt-1">Action required</p>
+                    </div>
+
+                    <!-- Due Soon -->
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm">
+                        <div class="flex items-center justify-between text-slate-500 mb-2">
+                            <span class="text-xs font-bold uppercase tracking-wider">Due Soon (3 Days)</span>
+                            <div class="w-8 h-8 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center">
+                                <i class="fa-solid fa-triangle-exclamation text-sm"></i>
+                            </div>
+                        </div>
+                        <div class="text-3xl font-extrabold text-rose-600" id="stat-duesoon">0</div>
+                        <p class="text-[11px] text-rose-500 font-medium mt-1">High urgency</p>
+                    </div>
+
+                    <!-- Completed -->
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm">
+                        <div class="flex items-center justify-between text-slate-500 mb-2">
+                            <span class="text-xs font-bold uppercase tracking-wider">Completed</span>
+                            <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                                <i class="fa-solid fa-circle-check text-sm"></i>
+                            </div>
+                        </div>
+                        <div class="text-3xl font-extrabold text-emerald-600" id="stat-completed">0</div>
+                        <p class="text-[11px] text-emerald-600 font-medium mt-1">Finished tasks</p>
+                    </div>
+                </div>
+
+                <!-- Dashboard Main Columns -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    
+                    <!-- Urgent & Upcoming Tasks List -->
+                    <div class="lg:col-span-2 bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm">
+                        <div class="flex items-center justify-between mb-4">
+                            <div>
+                                <h2 class="text-base font-bold text-slate-900 flex items-center gap-2">
+                                    <i class="fa-solid fa-fire text-rose-500"></i> Urgent & Upcoming Deadlines
+                                </h2>
+                                <p class="text-xs text-slate-500">Sorted by live remaining time</p>
+                            </div>
+                            <button onclick="navigateTo('assignments')" class="text-xs font-bold text-indigo-600 hover:text-indigo-800">
+                                View All Tasks →
+                            </button>
+                        </div>
+
+                        <!-- Live Task List -->
+                        <div id="urgent-tasks-container" class="space-y-3">
+                            <!-- JS populated -->
+                        </div>
+                    </div>
+
+                    <!-- Platform Integration Breakdown & Quick Interactive Tools -->
+                    <div class="space-y-6">
+                        <!-- Source Channels breakdown -->
+                        <div class="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm">
+                            <h2 class="text-base font-bold text-slate-900 mb-1">Channel Sources</h2>
+                            <p class="text-xs text-slate-500 mb-4">Centralized task sources</p>
+
+                            <div class="space-y-3">
+                                <div class="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-100">
+                                    <div class="flex items-center gap-3">
+                                        <span class="w-8 h-8 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center text-sm">
+                                            <i class="fa-solid fa-laptop-code"></i>
+                                        </span>
+                                        <div>
+                                            <div class="text-xs font-bold text-slate-800">LMS Portal</div>
+                                            <div class="text-[10px] text-slate-400">Connected</div>
+                                        </div>
+                                    </div>
+                                    <span class="text-xs font-extrabold text-slate-800" id="count-source-lms">0</span>
+                                </div>
+
+                                <div class="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-100">
+                                    <div class="flex items-center gap-3">
+                                        <span class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center text-sm">
+                                            <i class="fa-brands fa-whatsapp"></i>
+                                        </span>
+                                        <div>
+                                            <div class="text-xs font-bold text-slate-800">WhatsApp Groups</div>
+                                            <div class="text-[10px] text-slate-400">Parser Active</div>
+                                        </div>
+                                    </div>
+                                    <span class="text-xs font-extrabold text-slate-800" id="count-source-whatsapp">0</span>
+                                </div>
+
+                                <div class="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-100">
+                                    <div class="flex items-center gap-3">
+                                        <span class="w-8 h-8 rounded-lg bg-purple-100 text-purple-600 flex items-center justify-center text-sm">
+                                            <i class="fa-solid fa-chalkboard-user"></i>
+                                        </span>
+                                        <div>
+                                            <div class="text-xs font-bold text-slate-800">Classroom Oral</div>
+                                            <div class="text-[10px] text-slate-400">Manual Entry</div>
+                                        </div>
+                                    </div>
+                                    <span class="text-xs font-extrabold text-slate-800" id="count-source-classroom">0</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Demo Quick Reset Panel -->
+                        <div class="bg-slate-900 text-white rounded-2xl p-5 shadow-sm space-y-3">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-bold text-indigo-300">Prototype Tools</span>
+                                <i class="fa-solid fa-wand-magic-sparkles text-amber-400"></i>
+                            </div>
+                            <p class="text-xs text-slate-300 leading-relaxed">
+                                Need to restart your demo flow? Restore default realistic sample data anytime.
+                            </p>
+                            <button onclick="resetSampleData()" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-rotate-left"></i> Restore Default Sample Data
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+
+            </section>
+
+            <!-- ================= SECTION 2: ADD ASSIGNMENT FORM ================= -->
+            <section id="section-add" class="hidden max-w-2xl mx-auto">
+                <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-md">
+                    <div class="border-b border-slate-100 pb-4 mb-6">
+                        <h2 class="text-2xl font-extrabold text-slate-900 flex items-center gap-2">
+                            <i class="fa-solid fa-plus-circle text-indigo-600"></i> Add New Assignment
+                        </h2>
+                        <p class="text-xs text-slate-500 mt-1">Enter assignment details to update your centralized task schedule.</p>
+                    </div>
+
+                    <form id="add-task-form" onsubmit="handleAddTask(event)" class="space-y-5">
+                        
+                        <div>
+                            <label class="block text-xs font-bold uppercase text-slate-600 mb-1" for="input-subject">
+                                Course / Subject Code <span class="text-rose-500">*</span>
+                            </label>
+                            <input type="text" id="input-subject" required placeholder="e.g. CS101 - Operating Systems" 
+                                   class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold uppercase text-slate-600 mb-1" for="input-title">
+                                Assignment Name / Topic <span class="text-rose-500">*</span>
+                            </label>
+                            <input type="text" id="input-title" required placeholder="e.g. Process Scheduling Simulation Lab" 
+                                   class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition">
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-slate-600 mb-1" for="input-source">
+                                    Received From (Source)
+                                </label>
+                                <select id="input-source" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition">
+                                    <option value="LMS">Moodle / LMS</option>
+                                    <option value="WhatsApp">WhatsApp Class Group</option>
+                                    <option value="Classroom">Classroom Announcement</option>
+                                    <option value="Other">Other / Email</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-slate-600 mb-1" for="input-priority">
+                                    Priority Level
+                                </label>
+                                <select id="input-priority" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition">
+                                    <option value="High">High Priority 🔥</option>
+                                    <option value="Medium" selected>Medium Priority ⚡</option>
+                                    <option value="Low">Low Priority ☕</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold uppercase text-slate-600 mb-1" for="input-deadline">
+                                Deadline Date & Time <span class="text-rose-500">*</span>
+                            </label>
+                            <input type="datetime-local" id="input-deadline" required 
+                                   class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition">
+                        </div>
+
+                        <div class="pt-2 flex items-center gap-3">
+                            <button type="submit" class="gradient-bg text-white px-6 py-3 rounded-xl font-bold text-sm shadow-lg hover:opacity-95 transition flex-grow">
+                                <i class="fa-solid fa-check"></i> Save Assignment
+                            </button>
+                            <button type="button" onclick="navigateTo('dashboard')" class="px-5 py-3 border border-slate-300 rounded-xl font-bold text-sm text-slate-600 hover:bg-slate-50 transition">
+                                Cancel
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
+            </section>
+
+            <!-- ================= SECTION 3: WHATSAPP TEXT PARSER SIMULATOR ================= -->
+            <section id="section-whatsapp" class="hidden max-w-3xl mx-auto space-y-6">
+                <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-md">
+                    <div class="flex items-center gap-3 border-b border-slate-100 pb-4 mb-6">
+                        <div class="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-2xl">
+                            <i class="fa-brands fa-whatsapp"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-xl font-extrabold text-slate-900">WhatsApp Class Announcement Parser</h2>
+                            <p class="text-xs text-slate-500">Extract assignments directly from copied group messages</p>
+                        </div>
+                    </div>
+
+                    <!-- Sample Presets for Fast Testing -->
+                    <div class="mb-4">
+                        <label class="block text-xs font-bold text-slate-600 mb-2">Click a Sample WhatsApp Announcement to Test:</label>
+                        <div class="flex flex-wrap gap-2">
+                            <button onclick="fillWhatsAppSample(1)" class="text-xs bg-slate-100 hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-200 border border-slate-200 px-3 py-1.5 rounded-xl transition">
+                                💬 "DBMS Project Phase 1 due Sunday"
+                            </button>
+                            <button onclick="fillWhatsAppSample(2)" class="text-xs bg-slate-100 hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-200 border border-slate-200 px-3 py-1.5 rounded-xl transition">
+                                💬 "Math Quiz 2 on Linear Algebra tomorrow"
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Textarea -->
+                    <div class="space-y-3">
+                        <textarea id="wa-text-input" rows="4" placeholder="Paste message from WhatsApp here... (e.g., Prof announced Data Structures Assignment 2 due in 2 days)"
+                                  class="w-full p-4 border border-slate-300 rounded-2xl text-sm focus:ring-2 focus:ring-emerald-500 outline-none"></textarea>
+
+                        <button onclick="parseWhatsAppMessage()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl text-sm shadow-md transition flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i> Parse Announcement & Add Task
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================= SECTION 4: ALL ASSIGNMENTS ================= -->
+            <section id="section-assignments" class="hidden space-y-6">
+                
+                <!-- Filter & Search Controls -->
+                <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/80 shadow-sm space-y-4">
+                    <div class="flex flex-col sm:flex-row gap-3 items-center justify-between">
+                        
+                        <!-- Search Input -->
+                        <div class="relative w-full sm:w-80">
+                            <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-400 text-sm"></i>
+                            <input type="text" id="assignment-search" oninput="renderAssignmentsView()" placeholder="Search subject or task..." 
+                                   class="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        </div>
+
+                        <!-- Sort Dropdown -->
+                        <div class="flex items-center gap-2 w-full sm:w-auto">
+                            <span class="text-xs font-bold text-slate-500 whitespace-nowrap">Sort by:</span>
+                            <select id="assignment-sort" onchange="renderAssignmentsView()" class="w-full sm:w-auto px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 outline-none">
+                                <option value="deadline">Deadline (Soonest First)</option>
+                                <option value="priority">Priority (High First)</option>
+                                <option value="subject">Subject Name</option>
+                            </select>
+                        </div>
+
+                    </div>
+
+                    <!-- Filter Pills -->
+                    <div class="flex flex-wrap gap-2 pt-2 border-t border-slate-100 text-xs font-semibold">
+                        <button onclick="setFilter('all')" id="filter-all" class="filter-tab px-3 py-1.5 rounded-lg bg-indigo-600 text-white">All</button>
+                        <button onclick="setFilter('pending')" id="filter-pending" class="filter-tab px-3 py-1.5 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200">Pending</button>
+                        <button onclick="setFilter('completed')" id="filter-completed" class="filter-tab px-3 py-1.5 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200">Completed</button>
+                        <button onclick="setFilter('LMS')" id="filter-LMS" class="filter-tab px-3 py-1.5 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200"><i class="fa-solid fa-laptop-code text-blue-500"></i> LMS</button>
+                        <button onclick="setFilter('WhatsApp')" id="filter-WhatsApp" class="filter-tab px-3 py-1.5 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200"><i class="fa-brands fa-whatsapp text-emerald-500"></i> WhatsApp</button>
+                        <button onclick="setFilter('Classroom')" id="filter-Classroom" class="filter-tab px-3 py-1.5 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200"><i class="fa-solid fa-chalkboard-user text-purple-500"></i> Classroom</button>
+                    </div>
+                </div>
+
+                <!-- Cards Grid Container -->
+                <div id="all-assignments-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <!-- JS populated -->
+                </div>
+
+            </section>
+
+            <!-- ================= SECTION 5: CALENDAR VIEW ================= -->
+            <section id="section-calendar" class="hidden space-y-6">
+                <div class="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm">
+                    
+                    <div class="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6 pb-4 border-b border-slate-100">
+                        <div>
+                            <h2 class="text-xl font-extrabold text-slate-900" id="calendar-month-year">Month Year</h2>
+                            <p class="text-xs text-slate-500">Interactive monthly deadline view</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="changeMonth(-1)" class="w-9 h-9 rounded-xl border border-slate-200 flex items-center justify-center hover:bg-slate-50 font-bold text-slate-600">
+                                <i class="fa-solid fa-chevron-left"></i>
+                            </button>
+                            <button onclick="resetToCurrentMonth()" class="px-3 py-1.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-50">
+                                Today
+                            </button>
+                            <button onclick="changeMonth(1)" class="w-9 h-9 rounded-xl border border-slate-200 flex items-center justify-center hover:bg-slate-50 font-bold text-slate-600">
+                                <i class="fa-solid fa-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-7 text-center text-xs font-bold text-slate-400 uppercase mb-2">
+                        <div>Sun</div>
+                        <div>Mon</div>
+                        <div>Tue</div>
+                        <div>Wed</div>
+                        <div>Thu</div>
+                        <div>Fri</div>
+                        <div>Sat</div>
+                    </div>
+
+                    <div id="calendar-days-grid" class="grid grid-cols-7 gap-1 sm:gap-2">
+                        <!-- JS populated -->
+                    </div>
+
+                </div>
+
+                <!-- Day Detail Popover -->
+                <div id="calendar-details-box" class="hidden bg-indigo-50 border border-indigo-200 rounded-2xl p-5 shadow-sm space-y-3">
+                    <div class="flex items-center justify-between">
+                        <h3 class="font-bold text-slate-900 text-sm" id="calendar-details-date">Tasks for Date</h3>
+                        <button onclick="document.getElementById('calendar-details-box').classList.add('hidden')" class="text-slate-400 hover:text-slate-700 text-xs font-bold">
+                            ✕ Close
+                        </button>
+                    </div>
+                    <div id="calendar-details-content" class="space-y-2"></div>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- FOOTER -->
+        <footer class="bg-white border-t border-slate-200 py-6 mt-12 text-center text-xs text-slate-500">
+            <div class="max-w-7xl mx-auto px-4">
+                <p class="font-semibold text-slate-700">Student Task Hub — Design Thinking Prototype</p>
+                <p class="mt-1">Computer Science Engineering Project</p>
+            </div>
+        </footer>
+
+    </div>
+
+    <!-- TOAST NOTIFICATION CONTAINER -->
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <script>
+        /**
+         * STUDENT TASK HUB - DYNAMIC CORE LOGIC
+         * Handles student session auth, task state, text parsing, LMS simulation, and calendar updates.
+         */
+
+        // Initial realistic tasks state
+        const DEFAULT_TASKS = [
+            {
+                id: 'task-1',
+                subject: 'CS101 Data Structures',
+                title: 'Array vs Linked List Comparative Report',
+                source: 'LMS',
+                priority: 'High',
+                deadline: new Date(Date.now() + 86400000 * 0.8).toISOString(), // ~19h away
+                completed: false
+            },
+            {
+                id: 'task-2',
+                subject: 'MA102 Linear Algebra',
+                title: 'Eigenvalues & Vector Problem Sheet 3',
+                source: 'WhatsApp',
+                priority: 'Medium',
+                deadline: new Date(Date.now() + 86400000 * 2.5).toISOString(), // ~2.5 days away
+                completed: false
+            },
+            {
+                id: 'task-3',
+                subject: 'EE105 Basic Electronics',
+                title: 'Breadboard Diode Circuit Simulation',
+                source: 'Classroom',
+                priority: 'Low',
+                deadline: new Date(Date.now() + 86400000 * 5).toISOString(),
+                completed: false
+            },
+            {
+                id: 'task-4',
+                subject: 'HS101 Professional Ethics',
+                title: 'Case Study Summary on AI Privacy',
+                source: 'LMS',
+                priority: 'Low',
+                deadline: new Date(Date.now() - 86400000 * 1).toISOString(),
+                completed: true
+            }
+        ];
+
+        let currentUser = JSON.parse(localStorage.getItem('student_task_hub_user')) || null;
+        let tasks = JSON.parse(localStorage.getItem('student_task_hub_data')) || DEFAULT_TASKS;
+        let currentFilter = 'all';
+        let calendarDate = new Date();
+
+        // Check auth status on initial load
+        function checkAuthStatus() {
+            if (currentUser && currentUser.name) {
+                document.getElementById('screen-login').classList.add('hidden');
+                document.getElementById('main-app').classList.remove('hidden');
+                updateUserProfileUI();
+                renderDashboardView();
+            } else {
+                document.getElementById('screen-login').classList.remove('hidden');
+                document.getElementById('main-app').classList.add('hidden');
+            }
+        }
+
+        function handleLogin(event) {
+            event.preventDefault();
+            const name = document.getElementById('login-name').value.trim();
+            const reg = document.getElementById('login-reg').value.trim().toUpperCase();
+            const sem = document.getElementById('login-sem').value;
+
+            currentUser = { name, reg, sem };
+            localStorage.setItem('student_task_hub_user', JSON.stringify(currentUser));
+
+            showToast(`Welcome, ${name}!`, 'success');
+            checkAuthStatus();
+        }
+
+        function quickFillLogin(name, reg, sem) {
+            document.getElementById('login-name').value = name;
+            document.getElementById('login-reg').value = reg;
+            document.getElementById('login-sem').value = sem;
+        }
+
+        function handleLogout() {
+            localStorage.removeItem('student_task_hub_user');
+            currentUser = null;
+            checkAuthStatus();
+            showToast('Logged out successfully', 'info');
+        }
+
+        function updateUserProfileUI() {
+            if (!currentUser) return;
+
+            // Initials avatar
+            const initials = currentUser.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+            
+            document.getElementById('header-user-avatar').innerText = initials;
+            document.getElementById('header-user-name').innerText = currentUser.name;
+            document.getElementById('header-user-reg').innerText = currentUser.reg;
+
+            document.getElementById('hero-user-name').innerText = `Welcome back, ${currentUser.name}! 👋`;
+            document.getElementById('hero-user-reg').innerText = currentUser.reg;
+            document.getElementById('hero-user-sem').innerText = currentUser.sem;
+        }
+
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast-animate pointer-events-auto px-4 py-3 rounded-xl shadow-lg text-xs font-bold text-white flex items-center gap-2 ${
+                type === 'success' ? 'bg-emerald-600' : type === 'info' ? 'bg-blue-600' : 'bg-rose-600'
+            }`;
+            
+            const icon = type === 'success' ? 'fa-circle-check' : type === 'info' ? 'fa-circle-info' : 'fa-triangle-exclamation';
+            toast.innerHTML = `<i class="fa-solid ${icon}"></i> ${message}`;
+            
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 3500);
+        }
+
+        function saveTasks() {
+            localStorage.setItem('student_task_hub_data', JSON.stringify(tasks));
+            updateDashboardStats();
+        }
+
+        function resetSampleData() {
+            tasks = [...DEFAULT_TASKS];
+            saveTasks();
+            showToast('Reset data back to default sample tasks!', 'info');
+            renderDashboardView();
+            renderAssignmentsView();
+        }
+
+        function getRelativeTimeString(deadlineIso) {
+            const now = new Date();
+            const due = new Date(deadlineIso);
+            const diffMs = due - now;
+
+            if (diffMs < 0) {
+                const pastMs = Math.abs(diffMs);
+                const daysAgo = Math.floor(pastMs / (1000 * 60 * 60 * 24));
+                return daysAgo === 0 ? 'Overdue today' : `Overdue by ${daysAgo}d`;
+            }
+
+            const hoursLeft = Math.floor(diffMs / (1000 * 60 * 60));
+            if (hoursLeft < 24) {
+                const minsLeft = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+                return `${hoursLeft}h ${minsLeft}m left`;
+            }
+
+            const daysLeft = Math.floor(hoursLeft / 24);
+            return `Due in ${daysLeft} day${daysLeft > 1 ? 's' : ''}`;
+        }
+
+        function isDueSoon(deadlineIso, isCompleted) {
+            if (isCompleted) return false;
+            const now = new Date();
+            const due = new Date(deadlineIso);
+            const diffMs = due - now;
+            return diffMs > 0 && diffMs <= (86400000 * 3); // Within 3 days
+        }
+
+        function formatDate(isoString) {
+            const date = new Date(isoString);
+            return date.toLocaleString('en-US', { 
+                month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' 
+            });
+        }
+
+        function getSourceBadgeHtml(source) {
+            switch(source) {
+                case 'LMS':
+                    return `<span class="bg-blue-50 text-blue-700 border border-blue-200 px-2.5 py-0.5 rounded-full text-[10px] font-bold flex items-center gap-1"><i class="fa-solid fa-laptop-code"></i> LMS</span>`;
+                case 'WhatsApp':
+                    return `<span class="bg-emerald-50 text-emerald-700 border border-emerald-200 px-2.5 py-0.5 rounded-full text-[10px] font-bold flex items-center gap-1"><i class="fa-brands fa-whatsapp"></i> WhatsApp</span>`;
+                default:
+                    return `<span class="bg-purple-50 text-purple-700 border border-purple-200 px-2.5 py-0.5 rounded-full text-[10px] font-bold flex items-center gap-1"><i class="fa-solid fa-chalkboard-user"></i> ${source}</span>`;
+            }
+        }
+
+        function getPriorityBadgeHtml(priority) {
+            if (priority === 'High') {
+                return `<span class="text-rose-600 bg-rose-50 border border-rose-200 px-2 py-0.5 rounded-md text-[10px] font-extrabold uppercase">High 🔥</span>`;
+            } else if (priority === 'Medium') {
+                return `<span class="text-amber-600 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-md text-[10px] font-extrabold uppercase">Medium ⚡</span>`;
+            }
+            return `<span class="text-slate-500 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded-md text-[10px] font-extrabold uppercase">Low ☕</span>`;
+        }
+
+        function navigateTo(sectionName) {
+            ['dashboard', 'add', 'whatsapp', 'assignments', 'calendar'].forEach(s => {
+                const el = document.getElementById(`section-${s}`);
+                if (el) el.classList.add('hidden');
+                
+                const navBtn = document.getElementById(`nav-${s}`);
+                if (navBtn) navBtn.classList.remove('active');
+            });
+
+            const target = document.getElementById(`section-${sectionName}`);
+            if (target) target.classList.remove('hidden');
+
+            const activeBtn = document.getElementById(`nav-${sectionName}`);
+            if (activeBtn) activeBtn.classList.add('active');
+
+            if (sectionName === 'dashboard') renderDashboardView();
+            if (sectionName === 'assignments') renderAssignmentsView();
+            if (sectionName === 'calendar') renderCalendarView();
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function renderDashboardView() {
+            updateDashboardStats();
+
+            const urgentContainer = document.getElementById('urgent-tasks-container');
+            urgentContainer.innerHTML = '';
+
+            const urgentTasks = tasks
+                .filter(t => !t.completed)
+                .sort((a, b) => new Date(a.deadline) - new Date(b.deadline))
+                .slice(0, 4);
+
+            if (urgentTasks.length === 0) {
+                urgentContainer.innerHTML = `
+                    <div class="text-center py-8 bg-slate-50 rounded-xl border border-dashed border-slate-200">
+                        <i class="fa-solid fa-circle-check text-3xl text-emerald-500 mb-2"></i>
+                        <p class="text-sm font-bold text-slate-700">All caught up!</p>
+                        <p class="text-xs text-slate-400">No urgent pending assignments.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            urgentTasks.forEach(task => {
+                const dueSoon = isDueSoon(task.deadline, task.completed);
+                const timeLeft = getRelativeTimeString(task.deadline);
+                const taskCard = document.createElement('div');
+                
+                taskCard.className = `p-4 rounded-xl border ${dueSoon ? 'bg-rose-50/60 border-rose-200 urgent-glow' : 'bg-slate-50 border-slate-200'} flex items-center justify-between gap-4 transition hover:shadow-sm`;
+
+                taskCard.innerHTML = `
+                    <div class="space-y-1 min-w-0">
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <span class="text-xs font-extrabold text-indigo-700">${task.subject}</span>
+                            ${getSourceBadgeHtml(task.source)}
+                            <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full ${dueSoon ? 'bg-rose-600 text-white animate-pulse' : 'bg-slate-200 text-slate-700'}">
+                                ${timeLeft}
+                            </span>
+                        </div>
+                        <h3 class="text-sm font-bold text-slate-800 truncate">${task.title}</h3>
+                        <p class="text-xs text-slate-500 flex items-center gap-1">
+                            <i class="fa-regular fa-clock"></i> Deadline: ${formatDate(task.deadline)}
+                        </p>
+                    </div>
+                    <div>
+                        <button onclick="toggleTaskComplete('${task.id}')" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg transition flex items-center gap-1 whitespace-nowrap shadow-sm">
+                            <i class="fa-solid fa-check"></i> Complete
+                        </button>
+                    </div>
+                `;
+                urgentContainer.appendChild(taskCard);
+            });
+        }
+
+        function updateDashboardStats() {
+            const total = tasks.length;
+            const completed = tasks.filter(t => t.completed).length;
+            const pending = total - completed;
+            const dueSoon = tasks.filter(t => isDueSoon(t.deadline, t.completed)).length;
+
+            document.getElementById('stat-total').innerText = total;
+            document.getElementById('stat-pending').innerText = pending;
+            document.getElementById('stat-completed').innerText = completed;
+            document.getElementById('stat-duesoon').innerText = dueSoon;
+
+            // Update Progress Hero Widget
+            const percent = total > 0 ? Math.round((completed / total) * 100) : 0;
+            document.getElementById('hero-progress-percent').innerText = `${percent}%`;
+            document.getElementById('hero-progress-bar').style.width = `${percent}%`;
+            document.getElementById('hero-progress-text').innerText = `${completed} of ${total} tasks completed`;
+
+            // Channel counts
+            document.getElementById('count-source-lms').innerText = tasks.filter(t => t.source === 'LMS').length;
+            document.getElementById('count-source-whatsapp').innerText = tasks.filter(t => t.source === 'WhatsApp').length;
+            document.getElementById('count-source-classroom').innerText = tasks.filter(t => t.source === 'Classroom').length;
+        }
+
+        function triggerLmsSync() {
+            const icon = document.getElementById('icon-sync');
+            icon.classList.add('fa-spin');
+            
+            showToast('Connecting to University Moodle LMS...', 'info');
+
+            setTimeout(() => {
+                icon.classList.remove('fa-spin');
+                
+                // Add simulated new assignment from LMS
+                const newLmsTask = {
+                    id: 'task-' + Date.now(),
+                    subject: 'CS102 Software Engineering',
+                    title: 'Software Requirement Specs (SRS) Document',
+                    source: 'LMS',
+                    priority: 'High',
+                    deadline: new Date(Date.now() + 86400000 * 3.5).toISOString(),
+                    completed: false
+                };
+
+                tasks.unshift(newLmsTask);
+                saveTasks();
+                renderDashboardView();
+                showToast('LMS Sync Complete! Imported 1 new assignment.', 'success');
+            }, 1200);
+        }
+
+        function fillWhatsAppSample(sampleNum) {
+            const textarea = document.getElementById('wa-text-input');
+            if (sampleNum === 1) {
+                textarea.value = "CR Announcement: Prof. Kumar asked to submit DBMS Project Phase 1 ER Diagrams by Sunday 11:59 PM on LMS.";
+            } else {
+                textarea.value = "Guys, Linear Algebra MA102 Quiz 2 is scheduled for tomorrow at 2:00 PM in Seminar Hall!";
+            }
+        }
+
+        function parseWhatsAppMessage() {
+            const text = document.getElementById('wa-text-input').value.trim();
+            if (!text) {
+                showToast('Please paste or select a WhatsApp message first!', 'rose');
+                return;
+            }
+
+            // Simple parser logic
+            let subject = 'CS - General';
+            if (text.toLowerCase().includes('dbms')) subject = 'CS201 DBMS';
+            else if (text.toLowerCase().includes('linear algebra') || text.toLowerCase().includes('ma102')) subject = 'MA102 Linear Algebra';
+            else if (text.toLowerCase().includes('data structure')) subject = 'CS101 Data Structures';
+
+            const newTask = {
+                id: 'task-' + Date.now(),
+                subject: subject,
+                title: text.length > 50 ? text.substring(0, 47) + '...' : text,
+                source: 'WhatsApp',
+                priority: 'High',
+                deadline: new Date(Date.now() + 86400000 * 2).toISOString(), // set default 2 days
+                completed: false
+            };
+
+            tasks.unshift(newTask);
+            saveTasks();
+            document.getElementById('wa-text-input').value = '';
+            showToast('Parsed & Added Assignment from WhatsApp message!', 'success');
+            navigateTo('assignments');
+        }
+
+        function handleAddTask(event) {
+            event.preventDefault();
+
+            const subject = document.getElementById('input-subject').value.trim();
+            const title = document.getElementById('input-title').value.trim();
+            const source = document.getElementById('input-source').value;
+            const priority = document.getElementById('input-priority').value;
+            const deadline = document.getElementById('input-deadline').value;
+
+            const newTask = {
+                id: 'task-' + Date.now(),
+                subject: subject,
+                title: title,
+                source: source,
+                priority: priority,
+                deadline: new Date(deadline).toISOString(),
+                completed: false
+            };
+
+            tasks.unshift(newTask);
+            saveTasks();
+
+            document.getElementById('add-task-form').reset();
+            showToast('Assignment saved successfully!', 'success');
+            navigateTo('assignments');
+        }
+
+        function setFilter(filterType) {
+            currentFilter = filterType;
+            document.querySelectorAll('.filter-tab').forEach(btn => {
+                btn.className = 'filter-tab px-3 py-1.5 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200';
+            });
+            const activeBtn = document.getElementById(`filter-${filterType}`);
+            if (activeBtn) activeBtn.className = 'filter-tab px-3 py-1.5 rounded-lg bg-indigo-600 text-white font-bold';
+
+            renderAssignmentsView();
+        }
+
+        function renderAssignmentsView() {
+            const grid = document.getElementById('all-assignments-grid');
+            const searchVal = document.getElementById('assignment-search').value.toLowerCase();
+            const sortBy = document.getElementById('assignment-sort').value;
+            grid.innerHTML = '';
+
+            let filtered = tasks.filter(task => {
+                const matchesSearch = task.subject.toLowerCase().includes(searchVal) || task.title.toLowerCase().includes(searchVal);
+                if (!matchesSearch) return false;
+
+                if (currentFilter === 'all') return true;
+                if (currentFilter === 'pending') return !task.completed;
+                if (currentFilter === 'completed') return task.completed;
+                return task.source === currentFilter;
+            });
+
+            // Sorting logic
+            filtered.sort((a, b) => {
+                if (sortBy === 'deadline') return new Date(a.deadline) - new Date(b.deadline);
+                if (sortBy === 'priority') {
+                    const weight = { High: 3, Medium: 2, Low: 1 };
+                    return weight[b.priority] - weight[a.priority];
+                }
+                return a.subject.localeCompare(b.subject);
+            });
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full py-12 text-center bg-white rounded-2xl border border-slate-200">
+                        <i class="fa-regular fa-folder-open text-4xl text-slate-300 mb-3"></i>
+                        <p class="text-base font-bold text-slate-700">No matching assignments</p>
+                        <p class="text-xs text-slate-400 mt-1">Try changing your filters or add a new task!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            filtered.forEach(task => {
+                const dueSoon = isDueSoon(task.deadline, task.completed);
+                const timeLeft = getRelativeTimeString(task.deadline);
+                const card = document.createElement('div');
+                
+                card.className = `bg-white rounded-2xl p-5 border ${task.completed ? 'border-slate-200 bg-slate-50/50 opacity-80' : dueSoon ? 'border-rose-300 ring-1 ring-rose-200' : 'border-slate-200/80'} shadow-sm flex flex-col justify-between transition hover:shadow-md relative`;
+
+                card.innerHTML = `
+                    <div>
+                        <div class="flex items-center justify-between gap-2 mb-3">
+                            ${getSourceBadgeHtml(task.source)}
+                            ${getPriorityBadgeHtml(task.priority)}
+                        </div>
+
+                        <div class="text-xs font-bold text-indigo-600 mb-0.5">${task.subject}</div>
+                        <h3 class="text-base font-bold text-slate-900 ${task.completed ? 'line-through text-slate-400' : ''}">${task.title}</h3>
+
+                        <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+                            <span class="text-slate-500 font-medium flex items-center gap-1">
+                                <i class="fa-regular fa-calendar"></i> ${formatDate(task.deadline)}
+                            </span>
+                            <span class="font-extrabold ${task.completed ? 'text-emerald-600' : dueSoon ? 'text-rose-600 animate-pulse' : 'text-slate-600'}">
+                                ${task.completed ? 'Completed ✓' : timeLeft}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="mt-5 flex items-center justify-between gap-2">
+                        <button onclick="toggleTaskComplete('${task.id}')" 
+                                class="flex-grow py-2 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 ${task.completed ? 'bg-amber-100 text-amber-800 hover:bg-amber-200' : 'bg-emerald-600 text-white hover:bg-emerald-700'}">
+                            <i class="fa-solid ${task.completed ? 'fa-rotate-left' : 'fa-check'}"></i> 
+                            ${task.completed ? 'Mark Pending' : 'Mark Done'}
+                        </button>
+
+                        <button onclick="deleteTask('${task.id}')" title="Delete Task" 
+                                class="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition">
+                            <i class="fa-solid fa-trash-can text-sm"></i>
+                        </button>
+                    </div>
+                `;
+
+                grid.appendChild(card);
+            });
+        }
+
+        function toggleTaskComplete(id) {
+            tasks = tasks.map(t => t.id === id ? { ...t, completed: !t.completed } : t);
+            saveTasks();
+            showToast('Task status updated!', 'info');
+            renderDashboardView();
+            renderAssignmentsView();
+            renderCalendarView();
+        }
+
+        function deleteTask(id) {
+            tasks = tasks.filter(t => t.id !== id);
+            saveTasks();
+            showToast('Assignment removed', 'rose');
+            renderAssignmentsView();
+            renderDashboardView();
+        }
+
+        function renderCalendarView() {
+            const year = calendarDate.getFullYear();
+            const month = calendarDate.getMonth();
+
+            const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+            document.getElementById('calendar-month-year').innerText = `${monthNames[month]} ${year}`;
+
+            const grid = document.getElementById('calendar-days-grid');
+            grid.innerHTML = '';
+
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+            for (let i = 0; i < firstDay; i++) {
+                const emptyCell = document.createElement('div');
+                emptyCell.className = "h-20 sm:h-24 bg-slate-50/50 rounded-xl border border-slate-100";
+                grid.appendChild(emptyCell);
+            }
+
+            const today = new Date();
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dateObj = new Date(year, month, day);
+                const isToday = today.getDate() === day && today.getMonth() === month && today.getFullYear() === year;
+
+                const dayTasks = tasks.filter(t => {
+                    const taskDate = new Date(t.deadline);
+                    return taskDate.getDate() === day && taskDate.getMonth() === month && taskDate.getFullYear() === year;
+                });
+
+                const dayCell = document.createElement('div');
+                dayCell.className = `h-20 sm:h-24 p-1.5 rounded-xl border transition flex flex-col justify-between cursor-pointer ${isToday ? 'bg-indigo-50/60 border-indigo-300' : 'bg-white border-slate-200 hover:border-indigo-200'}`;
+                dayCell.onclick = () => showCalendarDayDetails(dateObj, dayTasks);
+
+                let indicatorsHtml = '';
+                dayTasks.slice(0, 2).forEach(t => {
+                    indicatorsHtml += `
+                        <div class="truncate text-[9px] font-bold px-1.5 py-0.5 rounded ${t.completed ? 'bg-slate-200 text-slate-500 line-through' : 'bg-indigo-100 text-indigo-800'}">
+                            ${t.subject}
+                        </div>
+                    `;
+                });
+
+                if (dayTasks.length > 2) {
+                    indicatorsHtml += `<div class="text-[9px] font-bold text-slate-400 pl-1">+${dayTasks.length - 2} more</div>`;
+                }
+
+                dayCell.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold ${isToday ? 'bg-indigo-600 text-white w-5 h-5 rounded-full flex items-center justify-center' : 'text-slate-700'}">${day}</span>
+                        ${dayTasks.length > 0 ? `<span class="w-2 h-2 rounded-full bg-rose-500"></span>` : ''}
+                    </div>
+                    <div class="space-y-1">
+                        ${indicatorsHtml}
+                    </div>
+                `;
+
+                grid.appendChild(dayCell);
+            }
+        }
+
+        function changeMonth(delta) {
+            calendarDate.setMonth(calendarDate.getMonth() + delta);
+            renderCalendarView();
+        }
+
+        function resetToCurrentMonth() {
+            calendarDate = new Date();
+            renderCalendarView();
+        }
+
+        function showCalendarDayDetails(dateObj, dayTasks) {
+            const box = document.getElementById('calendar-details-box');
+            const dateTitle = document.getElementById('calendar-details-date');
+            const content = document.getElementById('calendar-details-content');
+
+            dateTitle.innerText = `Assignments Due on ${dateObj.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}`;
+            content.innerHTML = '';
+
+            if (dayTasks.length === 0) {
+                content.innerHTML = `<p class="text-xs text-slate-500 italic">No deadlines on this day.</p>`;
+            } else {
+                dayTasks.forEach(t => {
+                    content.innerHTML += `
+                        <div class="bg-white p-3 rounded-xl border border-indigo-100 flex items-center justify-between gap-3">
+                            <div class="min-w-0">
+                                <span class="text-xs font-bold text-indigo-600">${t.subject}</span>
+                                <h4 class="text-xs font-bold text-slate-800 truncate">${t.title}</h4>
+                            </div>
+                            <button onclick="toggleTaskComplete('${t.id}')" class="px-2.5 py-1 text-[11px] font-bold bg-emerald-100 text-emerald-800 rounded-lg hover:bg-emerald-200">
+                                ${t.completed ? 'Done ✓' : 'Mark Done'}
+                            </button>
+                        </div>
+                    `;
+                });
+            }
+
+            box.classList.remove('hidden');
+        }
+
+        // Initialize application state on window load
+        window.onload = function() {
+            checkAuthStatus();
+            saveTasks();
+            
+            // Refresh relative countdown times every 30 seconds
+            setInterval(() => {
+                if (currentUser) renderDashboardView();
+            }, 30000);
+        };
+    </script>
+</body>
+</html>
